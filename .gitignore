@@ -2,9 +2,15 @@ build/
 .gradle/
 *.iml
 .idea/
+.kotlin/
 out/
 *.class
 *.jar
 *.log
 local.properties
 .DS_Store
+.env*
+
+# Signing keys (for Maven Central publishing)
+*.gpg
+secring.gpg

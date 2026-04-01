@@ -44,23 +44,15 @@ tasks.test {
   useJUnitPlatform()
 }
 
+java {
+  withSourcesJar()
+  withJavadocJar()
+}
+
 publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
-
-      pom {
-        name.set("PageIndex")
-        description.set("LLM-powered hierarchical document indexing and retrieval for the JVM")
-        url.set("https://github.com/AstroSpartan/page-index")
-
-        licenses {
-          license {
-            name.set("Apache License 2.0")
-            url.set("https://www.apache.org/licenses/LICENSE-2.0")
-          }
-        }
-      }
     }
   }
 }

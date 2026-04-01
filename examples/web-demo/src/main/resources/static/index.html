@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PageIndex Demo</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --text: #1e293b;
+      --muted: #64748b;
+      --mono: "SF Mono", "Cascadia Code", "Fira Code", Menlo, monospace;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 { font-size: 1.75rem; font-weight: 700; }
+    header p { color: var(--muted); margin-top: 0.25rem; font-size: 0.95rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Settings */
+    .settings-toggle {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .settings-toggle:hover { text-decoration: underline; }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .settings-grid.hidden { display: none; }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    textarea {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      resize: vertical;
+      min-height: 200px;
+    }
+
+    .btn-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+
+    button {
+      padding: 0.5rem 1.25rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg); color: var(--text); }
+
+    /* Status bar */
+    .status {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+    .status.error { display: block; background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+    .status.loading { display: block; background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
+    .status.success { display: block; background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+
+    /* Tree */
+    .tree-meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .tree-meta .stat {
+      font-size: 0.85rem;
+    }
+    .tree-meta .stat strong {
+      display: block;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .tree-meta .stat span { color: var(--muted); }
+
+    .tree-view { font-size: 0.85rem; }
+    .tree-node {
+      margin-left: 1.25rem;
+      border-left: 2px solid var(--border);
+      padding-left: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    .tree-node-root { margin-left: 0; border-left: none; padding-left: 0; }
+    .tree-node-title {
+      font-weight: 500;
+      cursor: default;
+    }
+    .tree-node-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .tree-node-summary {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 0.15rem;
+    }
+
+    /* Query */
+    .query-input {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .query-input input { flex: 1; }
+
+    /* Answer */
+    .answer-box {
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .answer-box h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    .answer-box h4:first-child { margin-top: 0; }
+    .answer-box p { margin-bottom: 0.5rem; }
+    .answer-box .source-pages {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+    .answer-box .source-pages span {
+      background: var(--primary);
+      color: white;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.35rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PageIndex Demo</h1>
+      <p>Upload markdown, build a tree index, then query it with natural language.</p>
+    </header>
+
+    <!-- Settings -->
+    <div class="card">
+      <button class="settings-toggle" onclick="toggleSettings()">
+        <span id="settings-arrow">&#9654;</span>&nbsp;LLM Settings
+      </button>
+      <div id="settings-panel" class="settings-grid hidden">
+        <div>
+          <label for="provider">Provider</label>
+          <select id="provider" onchange="onProviderChange()">
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="openai_compatible">OpenAI Compatible</option>
+          </select>
+        </div>
+        <div>
+          <label for="model">Model</label>
+          <input id="model" type="text" placeholder="gpt-4o">
+        </div>
+        <div>
+          <label for="apiKey">API Key</label>
+          <input id="apiKey" type="password" placeholder="sk-...">
+        </div>
+        <div id="baseUrlGroup">
+          <label for="baseUrl">Base URL <span style="color:var(--muted)">(optional)</span></label>
+          <input id="baseUrl" type="text" placeholder="https://api.openai.com/v1">
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Input -->
+    <div class="card">
+      <div class="card-title">Document</div>
+      <textarea id="markdown" placeholder="Paste your markdown document here..."></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" id="buildBtn" onclick="buildIndex()">Build Index</button>
+        <button class="btn-secondary" onclick="loadSample()">Load Sample</button>
+      </div>
+      <div id="buildStatus" class="status"></div>
+    </div>
+
+    <!-- Tree View -->
+    <div id="treeSection" class="card hidden">
+      <div class="card-title">Tree Index</div>
+      <div id="treeMeta" class="tree-meta"></div>
+      <div id="treeView" class="tree-view"></div>
+    </div>
+
+    <!-- Query -->
+    <div id="querySection" class="card hidden">
+      <div class="card-title">Query</div>
+      <div class="query-input">
+        <input id="queryInput" type="text" placeholder="Ask a question about the document..."
+               onkeydown="if(event.key==='Enter') askQuery()">
+        <button class="btn-primary" id="queryBtn" onclick="askQuery()">Ask</button>
+      </div>
+      <div id="queryStatus" class="status"></div>
+      <div id="answerBox" class="answer-box hidden"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentDocumentId = null;
+
+    function toggleSettings() {
+      const panel = document.getElementById('settings-panel');
+      const arrow = document.getElementById('settings-arrow');
+      panel.classList.toggle('hidden');
+      arrow.innerHTML = panel.classList.contains('hidden') ? '&#9654;' : '&#9660;';
+    }
+
+    function onProviderChange() {
+      const provider = document.getElementById('provider').value;
+      const modelInput = document.getElementById('model');
+      if (!modelInput.value || modelInput.value === 'gpt-4o' || modelInput.value === 'claude-sonnet-4-20250514' || modelInput.value === 'llama3') {
+        if (provider === 'openai') modelInput.placeholder = 'gpt-4o';
+        else if (provider === 'anthropic') modelInput.placeholder = 'claude-sonnet-4-20250514';
+        else modelInput.placeholder = 'llama3';
+      }
+    }
+
+    function getSettings() {
+      const provider = document.getElementById('provider').value;
+      const model = document.getElementById('model').value;
+      const apiKey = document.getElementById('apiKey').value;
+      const baseUrl = document.getElementById('baseUrl').value;
+
+      const settings = { provider };
+      if (model) settings.model = model;
+      if (apiKey) settings.apiKey = apiKey;
+      if (baseUrl) settings.baseUrl = baseUrl;
+      return settings;
+    }
+
+    function setStatus(id, type, message) {
+      const el = document.getElementById(id);
+      el.className = 'status ' + type;
+      el.textContent = message;
+    }
+
+    function clearStatus(id) {
+      const el = document.getElementById(id);
+      el.className = 'status';
+      el.textContent = '';
+    }
+
+    async function buildIndex() {
+      const markdown = document.getElementById('markdown').value.trim();
+      if (!markdown) {
+        setStatus('buildStatus', 'error', 'Please enter some markdown text.');
+        return;
+      }
+
+      const btn = document.getElementById('buildBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Building...';
+      setStatus('buildStatus', 'loading', 'Sending document to LLM for structure detection. This may take a minute...');
+
+      try {
+        const resp = await fetch('/api/build', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ markdown, settings: getSettings() })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          setStatus('buildStatus', 'error', data.error || 'Build failed');
+          return;
+        }
+
+        currentDocumentId = data.documentId;
+        setStatus('buildStatus', 'success', 'Index built successfully!');
+        renderTree(data);
+
+        document.getElementById('treeSection').classList.remove('hidden');
+        document.getElementById('querySection').classList.remove('hidden');
+        document.getElementById('queryInput').focus();
+
+      } catch (e) {
+        setStatus('buildStatus', 'error', 'Request failed: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Build Index';
+      }
+    }
+
+    function renderTree(data) {
+      // Metadata
+      const meta = document.getElementById('treeMeta');
+      meta.innerHTML = `
+        <div class="stat"><strong>${data.totalNodes}</strong><span>Nodes</span></div>
+        <div class="stat"><strong>${data.totalPages}</strong><span>Pages</span></div>
+        <div class="stat"><strong>${data.maxDepth}</strong><span>Max Depth</span></div>
+        <div class="stat"><strong>${data.indexingMethod}</strong><span>Method</span></div>
+      `;
+
+      // Tree
+      const view = document.getElementById('treeView');
+      view.innerHTML = renderNodes(data.tree, true);
+    }
+
+    function renderNodes(nodes, isRoot) {
+      if (!nodes || nodes.length === 0) return '';
+      return nodes.map(node => {
+        const pages = node.startPage === node.endPage
+          ? `p.${node.startPage}`
+          : `p.${node.startPage}-${node.endPage}`;
+        const summary = node.summary ? `<div class="tree-node-summary">${escHtml(node.summary)}</div>` : '';
+        const children = renderNodes(node.children, false);
+        return `
+          <div class="tree-node ${isRoot ? 'tree-node-root' : ''}">
+            <div class="tree-node-title">${escHtml(node.title)}</div>
+            <div class="tree-node-meta">${pages}</div>
+            ${summary}
+            ${children}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function askQuery() {
+      const query = document.getElementById('queryInput').value.trim();
+      if (!query || !currentDocumentId) return;
+
+      const btn = document.getElementById('queryBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      setStatus('queryStatus', 'loading', 'LLM is navigating the tree to find relevant sections...');
+      document.getElementById('answerBox').classList.add('hidden');
+
+      try {
+        const resp = await fetch('/api/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ documentId: currentDocumentId, query, settings: getSettings() })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          setStatus('queryStatus', 'error', data.error || 'Query failed');
+          return;
+        }
+
+        clearStatus('queryStatus');
+        renderAnswer(data);
+
+      } catch (e) {
+        setStatus('queryStatus', 'error', 'Request failed: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Ask';
+      }
+    }
+
+    function renderAnswer(data) {
+      const box = document.getElementById('answerBox');
+      const pages = data.sourcePages.map(p => `<span>Page ${p}</span>`).join('');
+      box.innerHTML = `
+        <h4>Answer</h4>
+        <p>${escHtml(data.answer)}</p>
+        <h4>Reasoning</h4>
+        <p>${escHtml(data.reasoning)}</p>
+        <h4>Source Pages</h4>
+        <div class="source-pages">${pages || '<span style="color:var(--muted)">None</span>'}</div>
+      `;
+      box.classList.remove('hidden');
+    }
+
+    function escHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function loadSample() {
+      document.getElementById('markdown').value = `# Acme Corp Annual Report 2024
+
+## Executive Summary
+
+Acme Corporation achieved record results in fiscal year 2024. Total revenue reached $52.3 million, up 28% year-over-year. The company expanded into three new markets and launched two major product lines.
+
+Key highlights:
+- Revenue: $52.3M (+28% YoY)
+- Net income: $8.7M (+35% YoY)
+- New customers: 1,200+
+- Employee count grew from 180 to 245
+
+## Financial Results
+
+### Revenue Breakdown
+
+Enterprise segment revenue was $31.4M, growing 32% year-over-year. This growth was driven by expansion into healthcare and financial services verticals. Average contract value increased from $85K to $112K.
+
+SMB segment revenue was $15.2M, up 22% from the prior year. The self-serve platform launched in Q2 contributed $4.1M in its first two quarters. Monthly active users grew 3x after the platform launch.
+
+Professional services revenue was $5.7M, up 18%. The consulting team completed 47 implementation projects with a 96% satisfaction rate.
+
+### Operating Expenses
+
+Total operating expenses were $41.8M, up from $34.2M in 2023. As a percentage of revenue, opex decreased from 84% to 80%.
+
+R&D spending was $16.2M (31% of revenue), up from $12.8M. The team shipped 4 major releases and filed 12 patents. Key investments included the AI-powered analytics engine and the real-time collaboration platform.
+
+Sales and marketing expenses were $15.4M (29% of revenue). Customer acquisition cost decreased 15% due to improved conversion rates and the self-serve channel.
+
+G&A expenses were $10.2M (20% of revenue), including $2.1M in one-time costs related to the new office lease and ERP implementation.
+
+### Cash Flow
+
+Operating cash flow was $12.4M, up from $8.1M. Free cash flow was $9.2M after $3.2M in capital expenditures.
+
+The company ended the year with $28.5M in cash and no debt. The board approved a $5M share buyback program.
+
+## Product Updates
+
+### Analytics Platform v3.0
+
+Released in March 2024, the v3.0 platform introduced AI-powered insights, natural language querying, and automated report generation. Adoption reached 78% of enterprise customers within 6 months.
+
+The natural language query feature processes over 50,000 queries daily. Customer feedback scores improved from 7.2 to 8.9 on a 10-point scale.
+
+### Collaboration Hub
+
+Launched in September 2024, the Collaboration Hub enables real-time document editing, task management, and team communication. Early metrics show 40% increase in user engagement and 25% reduction in email volume for adopting teams.
+
+### Mobile App
+
+The mobile app was completely redesigned with offline support, biometric authentication, and push notifications. App store ratings improved from 3.2 to 4.6 stars. Daily active mobile users grew 150%.
+
+## Market Expansion
+
+### Healthcare Vertical
+
+Entered the healthcare market in Q1 2024. Achieved HIPAA compliance certification. Signed 15 hospital systems and 23 clinic networks. Healthcare revenue reached $4.8M in the first year.
+
+### Financial Services
+
+Launched SOC 2 Type II compliant offering for financial services in Q2. Won contracts with 8 regional banks and 3 insurance companies. Pipeline for 2025 exceeds $12M.
+
+### International
+
+Opened offices in London and Singapore. International revenue grew from $2.1M to $6.3M (12% of total). Localized the platform for 8 languages.
+
+## 2025 Outlook
+
+The company expects revenue between $65M and $70M in 2025 (25-34% growth). Key initiatives include:
+
+- Launch of the AI Assistant product line (Q1)
+- Expansion into government sector
+- Opening of Tokyo office
+- Target: 400+ employees by year end
+- Goal: achieve cash flow breakeven for international operations
+
+The board is confident in the company's trajectory and long-term growth potential.`;
+      setStatus('buildStatus', 'success', 'Sample document loaded. Click "Build Index" to start.');
+    }
+  </script>
+</body>
+</html>

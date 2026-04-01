@@ -4,6 +4,12 @@ import arrow.core.Either
 import io.pageindex.exception.PageIndexException
 import io.pageindex.api.model.LlmMessage
 
+/**
+ * Wraps an [LlmClient] to return parsed JSON objects.
+ *
+ * Sends schema hints to the LLM and deserializes the response.
+ * Retries once with a corrective prompt if parsing fails.
+ */
 interface StructuredChatService {
   suspend fun <T> chat(
     messages: List<LlmMessage>,

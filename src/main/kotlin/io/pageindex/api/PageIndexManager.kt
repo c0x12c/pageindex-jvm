@@ -10,6 +10,12 @@ import io.pageindex.api.model.ParsedPage
 import io.pageindex.api.model.RetrievedContext
 import java.util.UUID
 
+/**
+ * Main entry point for document indexing and retrieval.
+ *
+ * Build a hierarchical index from document pages, then search or query it.
+ * Use [io.pageindex.core.PageIndex.create] for easy setup.
+ */
 interface PageIndexManager {
   suspend fun buildAndSave(
     documentId: UUID,

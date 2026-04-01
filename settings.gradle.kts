@@ -1,1 +1,1 @@
-rootProject.name = "page-index"
+rootProject.name = "pageindex-jvm"

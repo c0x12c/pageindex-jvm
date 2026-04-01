@@ -7,6 +7,12 @@ import io.pageindex.api.model.IndexingConfig
 import io.pageindex.api.model.ParsedPage
 import java.util.UUID
 
+/**
+ * Builds a hierarchical [DocumentTree] from parsed document pages.
+ *
+ * Detects document structure, splits oversized nodes, generates summaries,
+ * and computes embeddings.
+ */
 interface TreeIndexBuilder {
   suspend fun buildIndex(
     documentId: UUID,
