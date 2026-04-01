@@ -15,7 +15,10 @@ import io.pageindex.api.model.LlmMessage
 import io.pageindex.api.model.LlmRole
 import io.pageindex.api.model.PageIndexError
 import io.pageindex.api.model.ParsedPage
+import io.pageindex.core.chat.StructuredChatService
+import io.pageindex.core.indexer.TreeIndexBuilder
 import io.pageindex.core.model.QaResult
+import io.pageindex.core.retriever.NodeRetriever
 import io.pageindex.api.model.RetrievedContext
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.retriever
 
 import arrow.core.Either
 import arrow.core.getOrElse
@@ -11,6 +11,7 @@ import io.pageindex.api.model.LlmMessage
 import io.pageindex.api.model.LlmRole
 import io.pageindex.api.model.RetrievedContext
 import io.pageindex.api.model.TreeNode
+import io.pageindex.core.chat.StructuredChatService
 
 class DefaultNodeRetriever(
   private val structuredChatService: StructuredChatService,

@@ -5,5 +5,6 @@ enum class IndexingMethod {
   TOC_WITHOUT_PAGES,
   HEADER_BASED,
   LLM_DETECTED,
+  REGEX_DISCOVERED,
   FLAT_PAGES
 }

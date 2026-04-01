@@ -15,5 +15,6 @@ enum class PromptName(val fileName: String) {
   SUMMARY("summary"),
   ROLLUP_SUMMARY("rollup-summary"),
   NODE_SELECTION("node-selection"),
-  ANSWER_GENERATION("answer-generation")
+  ANSWER_GENERATION("answer-generation"),
+  REGEX_DISCOVERY("regex-discovery")
 }

@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.embedding
 
 import io.pageindex.api.NodeEmbeddingService
 

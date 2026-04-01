@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.indexer
 
 import io.pageindex.api.model.TreeNode
 import org.junit.jupiter.api.Assertions.assertEquals

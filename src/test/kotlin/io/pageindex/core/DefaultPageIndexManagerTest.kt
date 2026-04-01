@@ -5,9 +5,9 @@ import arrow.core.left
 import arrow.core.right
 import io.pageindex.api.PageIndexException
 import io.pageindex.api.LlmClient
-import io.pageindex.core.NodeRetriever
-import io.pageindex.core.StructuredChatService
-import io.pageindex.core.TreeIndexBuilder
+import io.pageindex.core.chat.StructuredChatService
+import io.pageindex.core.indexer.TreeIndexBuilder
+import io.pageindex.core.retriever.NodeRetriever
 import io.pageindex.api.model.DocumentTree
 import io.pageindex.api.model.IndexingConfig
 import io.pageindex.api.model.IndexingMethod

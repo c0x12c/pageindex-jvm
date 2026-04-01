@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.store
 
 import io.pageindex.api.DocumentTreeStore
 import io.pageindex.api.model.DocumentTree

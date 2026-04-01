@@ -19,7 +19,7 @@ import io.pageindex.api.model.LlmMessage
 import io.pageindex.api.model.LlmRole
 import io.pageindex.api.model.ParsedPage
 import io.pageindex.api.model.TreeNode
-import io.pageindex.core.InMemoryDocumentTreeStore
+import io.pageindex.core.store.InMemoryDocumentTreeStore
 import io.pageindex.core.PageIndex
 import io.pageindex.core.llm.LiteLlmClient
 import io.pageindex.core.llm.LlmProvider

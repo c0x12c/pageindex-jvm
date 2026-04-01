@@ -5,14 +5,24 @@ import io.pageindex.api.LlmClient
 import io.pageindex.api.NodeEmbeddingService
 import io.pageindex.api.PageIndexManager
 import io.pageindex.api.PromptProvider
+import io.pageindex.api.RegexPatternCache
 import io.pageindex.api.StructureDetector
+import io.pageindex.core.chat.DefaultStructuredChatService
+import io.pageindex.core.chat.StructuredChatService
 import io.pageindex.core.detector.ChainedStructureDetector
 import io.pageindex.core.detector.FlatPagesFallback
+import io.pageindex.core.detector.LlmRegexDiscoveryDetector
 import io.pageindex.core.detector.LlmStructureDetector
-import io.pageindex.core.detector.MarkdownHeaderDetector
+import io.pageindex.core.detector.MarkdownRegexDetector
 import io.pageindex.core.detector.RegexTocDetector
 import io.pageindex.core.detector.TocNoPageNumbersDetector
+import io.pageindex.core.embedding.NoOpEmbeddingService
+import io.pageindex.core.indexer.DefaultTreeIndexBuilder
+import io.pageindex.core.indexer.TreeIndexBuilder
 import io.pageindex.core.prompt.ResourcePromptProvider
+import io.pageindex.core.retriever.DefaultNodeRetriever
+import io.pageindex.core.retriever.NodeRetriever
+import io.pageindex.core.store.InMemoryDocumentTreeStore
 
 /**
  * Builder for creating a [PageIndexManager] with minimal setup.
@@ -58,6 +68,9 @@ class PageIndexBuilder {
   /** Optional. Custom node retriever. Built from structured chat service if not set. */
   var nodeRetriever: NodeRetriever? = null
 
+  /** Optional. Cache for LLM-discovered regex patterns. */
+  var regexPatternCache: RegexPatternCache? = null
+
   /** Maximum nodes to select per query. Default: 5. */
   var maxNodes: Int = 5
 
@@ -71,6 +84,7 @@ class PageIndexBuilder {
   fun promptProvider(provider: PromptProvider) = apply { this.promptProvider = provider }
   fun treeIndexBuilder(builder: TreeIndexBuilder) = apply { this.treeIndexBuilder = builder }
   fun nodeRetriever(retriever: NodeRetriever) = apply { this.nodeRetriever = retriever }
+  fun regexPatternCache(cache: RegexPatternCache) = apply { this.regexPatternCache = cache }
   fun maxNodes(maxNodes: Int) = apply { this.maxNodes = maxNodes }
 
   /**
@@ -80,6 +94,7 @@ class PageIndexBuilder {
    */
   fun build(): PageIndexManager {
     val llm = requireNotNull(llmClient) { "llmClient is required. Set it via llmClient(yourClient) or llmClient = yourClient" }
+    require(maxNodes > 0) { "maxNodes must be positive, got $maxNodes" }
 
     val prompts = promptProvider ?: ResourcePromptProvider()
     val structured = structuredChatService ?: DefaultStructuredChatService(llm)
@@ -89,7 +104,8 @@ class PageIndexBuilder {
     val detector = structureDetector ?: ChainedStructureDetector(
       listOf(
         RegexTocDetector(),
-        MarkdownHeaderDetector(),
+        MarkdownRegexDetector(),
+        LlmRegexDiscoveryDetector(llm, prompts, regexPatternCache),
         TocNoPageNumbersDetector(llm, prompts),
         LlmStructureDetector(llm, prompts),
         FlatPagesFallback()

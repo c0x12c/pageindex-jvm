@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.chat
 
 import arrow.core.Either
 import arrow.core.left

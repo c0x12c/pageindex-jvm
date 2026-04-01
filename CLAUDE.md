@@ -28,9 +28,18 @@ PageIndex is a Kotlin/JVM library for LLM-powered hierarchical document indexing
 
 - `io.pageindex.api/` — Public interfaces, data models, and `PageIndexException`. All new public interfaces go here.
 - `io.pageindex.api.model/` — Public data models (DocumentTree, ParsedPage, IndexingConfig, etc.).
-- `io.pageindex.core/` — Default implementations. All new implementations go here.
+- `io.pageindex.core/` — Entry points: `PageIndexBuilder`, `DefaultPageIndexManager`.
+- `io.pageindex.core.indexer/` — Tree building pipeline: `TreeIndexBuilder`, `TreeBuilder`, `NodeSplitter`, `SummaryGenerator`.
+- `io.pageindex.core.retriever/` — Node retrieval: `NodeRetriever`, `DefaultNodeRetriever`, `HybridNodeRetriever`, `CompactTreeSerializer`.
+- `io.pageindex.core.chat/` — Structured LLM chat: `StructuredChatService`, `DefaultStructuredChatService`.
+- `io.pageindex.core.store/` — Persistence: `InMemoryDocumentTreeStore`.
+- `io.pageindex.core.embedding/` — Embedding: `NoOpEmbeddingService`.
+- `io.pageindex.core.detector/` — Structure detection chain.
 - `io.pageindex.core.model/` — Internal data models (not part of public API).
 - `io.pageindex.core.llm/` — `LiteLlmClient` multi-provider LLM client.
+- `io.pageindex.core.prompt/` — Prompt template rendering.
+- `io.pageindex.core.verify/` — TOC verification and fixing.
+- `io.pageindex.core.util/` — JSON parsing, schema hints, token counting.
 
 ### Public Interfaces (api/)
 
@@ -43,13 +52,13 @@ PageIndex is a Kotlin/JVM library for LLM-powered hierarchical document indexing
 | `DocumentTreeStore` | Persistence layer for `DocumentTree` |
 | `PromptProvider` | Template-based prompt management |
 
-### Internal Interfaces (core/)
+### Internal Interfaces
 
-| Interface | Purpose |
-|---|---|
-| `TreeIndexBuilder` | Builds hierarchical index from `ParsedPage` list |
-| `NodeRetriever` | LLM-based node selection from tree |
-| `StructuredChatService` | Wraps LlmClient to return parsed JSON objects |
+| Interface | Package | Purpose |
+|---|---|---|
+| `TreeIndexBuilder` | `core.indexer` | Builds hierarchical index from `ParsedPage` list |
+| `NodeRetriever` | `core.retriever` | LLM-based node selection from tree |
+| `StructuredChatService` | `core.chat` | Wraps LlmClient to return parsed JSON objects |
 
 ### Structure Detection Chain
 

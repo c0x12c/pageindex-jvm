@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.retriever
 
 import io.pageindex.api.model.DocumentTree
 import io.pageindex.api.model.IndexingMethod

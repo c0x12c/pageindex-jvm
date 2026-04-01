@@ -43,4 +43,34 @@ data class IndexingConfig(
   val summaryConcurrency: Int = 5,
   val embeddingConcurrency: Int = 3,
   val structureDetectionConcurrency: Int = 5
-)
+) {
+  init {
+    // Size and token limits
+    require(maxNodeTextLength > 0) { "maxNodeTextLength must be positive, got $maxNodeTextLength" }
+    require(summaryMaxTokens > 0) { "summaryMaxTokens must be positive, got $summaryMaxTokens" }
+    require(pageGroupMaxTokens > 0) { "pageGroupMaxTokens must be positive, got $pageGroupMaxTokens" }
+
+    // Batch and count thresholds
+    require(batchSummarySize > 0) { "batchSummarySize must be positive, got $batchSummarySize" }
+    require(tocScanPages > 0) { "tocScanPages must be positive, got $tocScanPages" }
+    require(minTocLineCount > 0) { "minTocLineCount must be positive, got $minTocLineCount" }
+    require(minHeaderCount > 0) { "minHeaderCount must be positive, got $minHeaderCount" }
+    require(verificationSampleSize > 0) { "verificationSampleSize must be positive, got $verificationSampleSize" }
+
+    // Accuracy threshold
+    require(verificationAccuracyThreshold in 0.0..1.0) {
+      "verificationAccuracyThreshold must be between 0.0 and 1.0, got $verificationAccuracyThreshold"
+    }
+
+    // Retry and radius limits (zero means disabled)
+    require(maxFixAttempts >= 0) { "maxFixAttempts must be non-negative, got $maxFixAttempts" }
+    require(maxExtractionRetries >= 0) { "maxExtractionRetries must be non-negative, got $maxExtractionRetries" }
+    require(pageGroupOverlap >= 0) { "pageGroupOverlap must be non-negative, got $pageGroupOverlap" }
+    require(fixSearchRadius >= 0) { "fixSearchRadius must be non-negative, got $fixSearchRadius" }
+
+    // Concurrency (zero would deadlock semaphores)
+    require(summaryConcurrency > 0) { "summaryConcurrency must be positive, got $summaryConcurrency" }
+    require(embeddingConcurrency > 0) { "embeddingConcurrency must be positive, got $embeddingConcurrency" }
+    require(structureDetectionConcurrency > 0) { "structureDetectionConcurrency must be positive, got $structureDetectionConcurrency" }
+  }
+}

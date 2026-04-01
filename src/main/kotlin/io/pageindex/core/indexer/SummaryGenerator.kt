@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.indexer
 
 import io.pageindex.api.PromptProvider
 import io.pageindex.api.model.LlmMessage
@@ -6,6 +6,7 @@ import io.pageindex.api.model.LlmRole
 import io.pageindex.api.model.PromptName
 import io.pageindex.core.model.SummaryEntry
 import io.pageindex.api.model.TreeNode
+import io.pageindex.core.chat.StructuredChatService
 import io.pageindex.core.prompt.PromptTemplate
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

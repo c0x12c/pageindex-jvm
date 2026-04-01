@@ -1,10 +1,10 @@
-name: Build
+name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -19,20 +19,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: ${{ runner.os }}-gradle-
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
+      - name: Build and test
         run: ./gradlew build
-
-      - name: Test
-        run: ./gradlew test
 
       - name: Upload test results
         if: always()

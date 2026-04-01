@@ -1,4 +1,4 @@
-package io.pageindex.core
+package io.pageindex.core.chat
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription
 import io.pageindex.api.LlmClient

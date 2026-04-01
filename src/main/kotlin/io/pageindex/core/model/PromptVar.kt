@@ -13,4 +13,5 @@ object PromptVar {
   const val PARTIAL_JSON_A = "partial_json_a"
   const val PARTIAL_JSON_B = "partial_json_b"
   const val TITLE = "title"
+  const val SAMPLE_PAGES_TEXT = "sample_pages_text"
 }
