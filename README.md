@@ -16,43 +16,89 @@ PageIndex builds a tree-structured index from documents (like a table of content
                     │  PDF / Text  │
                     └──────┬───────┘
                            │
-                    ┌──────▼───────┐
-                    │  Structure   │    Tries: TOC regex → Headers → Regex discovery → LLM → Fallback
-                    │  Detection   │
-                    └──────┬───────┘
+              ┌────────────▼────────────┐
+              │     Regex Detection     │  TOC patterns, markdown headers
+              │  (fast, no LLM calls)   │
+              └────────────┬────────────┘
+                           │ not found?
+              ┌────────────▼────────────┐
+              │   LLM-Assisted Detection│  Regex discovery, TOC matching,
+              │  (smart, cached)        │  map-reduce structure analysis
+              └────────────┬────────────┘
+                           │ still not found?
+              ┌────────────▼────────────┐
+              │        Fallback         │  Flat page chunking
+              └────────────┬────────────┘
                            │
-                    ┌──────▼───────┐
-                    │  Tree Index  │    Hierarchical tree with titles, page ranges, summaries
-                    │              │
-                    └──────┬───────┘
+              ┌────────────▼────────────┐
+              │       Tree Index        │  Hierarchical tree with titles,
+              │                         │  page ranges, summaries
+              └────────────┬────────────┘
                            │
-                    ┌──────▼───────┐
-                    │  LLM Query   │    Navigate tree → Select sections → Generate answer
-                    │              │
-                    └──────┬───────┘
+              ┌────────────▼────────────┐
+              │       Retrieval         │  LLM reasoning or hybrid
+              │                         │  BM25 + embedding
+              └────────────┬────────────┘
                            │
-                    ┌──────▼───────┐
-                    │   Answer +   │    Answer with source pages, reasoning, section references
-                    │  Source Pages │
-                    └──────────────┘
+              ┌────────────▼────────────┐
+              │    Answer + Sources     │  Answer with source pages,
+              │                         │  reasoning, section references
+              └────────────────────────┘
 ```
 
-**Stage 1: Build Index** — Detect document structure (TOC, headers, or LLM-based) and build a hierarchical tree.
+### Pipeline
 
-**Stage 2: Retrieve** — Given a query, the LLM navigates the tree to select the most relevant sections.
+**Stage 1: Detect Structure** — A chain of 6 detectors runs in order. The first one that succeeds wins. Fast regex methods run first. LLM-based methods run only if needed.
 
-### Structure Detection Methods
+**Stage 2: Build Tree** — Detected sections become a hierarchical tree. Oversized nodes are split at paragraph boundaries. Summaries are generated bottom-up (leaves first, then parents).
 
-PageIndex tries multiple detection strategies in order:
+**Stage 3: Retrieve** — Given a query, either the LLM navigates the tree to pick relevant sections, or a hybrid BM25+embedding scorer ranks nodes without an LLM call.
 
-| Method | How |
-|---|---|
-| `TOC_WITH_PAGES` | Regex-based TOC detection (dot leaders, dash leaders, tab-separated) |
-| `HEADER_BASED` | Detects markdown-style headers (`# ## ###`) via regex |
-| `REGEX_DISCOVERED` | LLM discovers regex patterns from page samples, then applies them |
-| `TOC_WITHOUT_PAGES` | LLM extracts TOC that lacks page numbers, then matches titles to pages |
-| `LLM_DETECTED` | LLM analyzes page groups to detect structure via map-reduce |
-| `FLAT_PAGES` | Fallback: chunks pages by text length |
+### Structure Detection Chain
+
+PageIndex tries 6 detection strategies in order. First match wins:
+
+| # | Method | Type | How |
+|---|---|---|---|
+| 1 | `TOC_WITH_PAGES` | Regex | Dot leaders, dash leaders, tab-separated page numbers. Handles unicode spaces and physical/logical page offset. |
+| 2 | `HEADER_BASED` | Regex | ATX headers (`#`), setext underlines, bold-line headers, numbered outlines. Code-block aware. |
+| 3 | `REGEX_DISCOVERED` | LLM + Regex | LLM analyzes page samples to discover header patterns. Patterns are validated, then applied deterministically. Results cached by content fingerprint. |
+| 4 | `TOC_WITHOUT_PAGES` | LLM | LLM extracts TOC entries that lack page numbers, then matches titles to pages. |
+| 5 | `LLM_DETECTED` | LLM | LLM analyzes page groups via map-reduce to build a hierarchical outline. |
+| 6 | `FLAT_PAGES` | Fallback | Chunks pages by text length. Always succeeds. |
+
+**Why this order?** Regex detectors are fast and free. LLM detectors are smart but cost API calls. The chain tries the cheapest option first and only escalates when needed.
+
+### LLM Regex Discovery
+
+This is a unique feature not found in the original PageIndex. When regex and header detectors fail, instead of jumping straight to full LLM analysis, the system:
+
+1. Takes a sample of pages and asks the LLM to find header patterns
+2. Validates each pattern: must compile, must have exactly one capturing group, must not match >50% of lines
+3. Applies validated patterns deterministically across all pages
+4. Caches patterns by SHA-256 fingerprint of the content — same document template never triggers a second LLM call
+
+This gives you the accuracy of LLM analysis with the speed of regex matching. Implement `RegexPatternCache` to persist patterns across runs (e.g., in Redis or a database).
+
+### Hybrid Retrieval
+
+Two retrieval strategies are built in:
+
+| Strategy | How | Best for |
+|---|---|---|
+| `DefaultNodeRetriever` | LLM reads the tree structure and picks relevant nodes | Highest accuracy, reasoning visible |
+| `HybridNodeRetriever` | BM25 text scoring + embedding cosine similarity, merged with Reciprocal Rank Fusion | Fast, no LLM call per query, works without embeddings |
+
+The hybrid retriever degrades gracefully — if no embeddings are available, it falls back to BM25 only. No tuning needed: RRF merges both signals without weight parameters.
+
+### Tree Building
+
+The indexing pipeline has 4 stages:
+
+1. **Detect** — Run the detection chain to find document sections
+2. **Build** — Convert flat TOC entries into a hierarchical tree. Front matter (cover pages, preamble) gets a synthetic node so no content is lost
+3. **Split** — Break oversized nodes at paragraph boundaries (`\n\n`), not at arbitrary character limits
+4. **Summarize** — Generate summaries bottom-up: leaf nodes first (from text), then parents (from child summaries). Batched LLM calls with concurrency control
 
 ## Quick Start
 
@@ -201,6 +247,8 @@ Paste markdown, build a tree index, then query it. Supports OpenAI, Anthropic, a
 | Retrieval | Similarity search | LLM reasoning over structure |
 | Interpretability | Low (which chunk matched?) | High (section title + page range) |
 | Setup | Vector DB + embeddings | Just an LLM |
+| Error handling | Varies | Typed errors with `Either<L, R>` |
+| Hybrid option | Separate system | Built-in BM25 + embedding fusion |
 
 <details>
 <summary><b>Tree Index Example Output</b></summary>
@@ -283,7 +331,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started.
 
 ## Origin
 
-Originally inspired by [VectifyAI/PageIndex](https://github.com/VectifyAI/PageIndex), a Python library for vectorless, reasoning-based RAG. This project has since grown into a standalone library with its own architecture and features.
+Originally inspired by [VectifyAI/PageIndex](https://github.com/VectifyAI/PageIndex), a Python library for vectorless, reasoning-based RAG. This project started from the same idea but has since grown into a standalone library with its own architecture and features beyond the original.
+
+**What we kept:** The core concept — build a tree index from document structure, then use LLM reasoning to navigate it.
+
+**What we added:**
+
+- **LLM regex discovery** — LLM finds header patterns, then regex applies them. Best of both worlds: LLM accuracy + regex speed. Patterns are cached by content fingerprint so the same document template never costs a second LLM call.
+- **Hybrid retrieval** — BM25 + embedding scoring merged with Reciprocal Rank Fusion. No weight tuning needed. Works even without embeddings.
+- **6-method detection chain** — Regex TOC, markdown headers, LLM regex discovery, TOC without pages, full LLM analysis, flat fallback. Cheapest method first.
+- **Paragraph-aware splitting** — Oversized nodes split at `\n\n` boundaries, not arbitrary character limits.
+- **Bottom-up summarization** — Leaves summarized from text, parents from child summaries. Batched LLM calls.
+- **Typed error handling** — Arrow `Either<PageIndexException, T>` throughout. No thrown exceptions in business logic. Errors carry HTTP status codes.
+- **Pluggable everything** — 8 interfaces you can swap: LLM client, embeddings, storage, detection, retrieval, prompts, chat service, regex cache.
 
 | | VectifyAI/PageIndex | This Project |
 |---|---|---|
@@ -291,11 +351,14 @@ Originally inspired by [VectifyAI/PageIndex](https://github.com/VectifyAI/PageIn
 | Architecture | Single-file functions | Interface-driven, modular |
 | LLM support | LiteLLM (Python) | Built-in `LiteLlmClient` + pluggable `LlmClient` interface |
 | Error handling | Exceptions | Arrow `Either<L, R>` |
-| Structure detection | Fixed strategies | 6-method chain with LLM regex discovery |
-| Retrieval | External agent loop | Built-in `NodeRetriever` with hybrid BM25+embedding option |
-| Embeddings | None | Optional `NodeEmbeddingService` |
-| Extensibility | None | Pluggable interfaces for detection, storage, caching |
-| Testing | None | JUnit 5 + MockK |
+| Structure detection | 4 fixed strategies | 6-method chain with LLM regex discovery + caching |
+| Retrieval | External agent loop | Built-in `NodeRetriever` + hybrid BM25+embedding |
+| Embeddings | None | Optional `NodeEmbeddingService` with mean-pooling |
+| Regex caching | None | Content-fingerprinted `RegexPatternCache` |
+| Tree building | Basic | Paragraph-aware splitting, front-matter detection, batched summarization |
+| Extensibility | Limited | 8 pluggable interfaces |
+| Concurrency | Basic asyncio | Kotlin coroutines with semaphore-based throttling |
+| Testing | None | JUnit 5 + MockK with test fixtures |
 
 ## License
 
