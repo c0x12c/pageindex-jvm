@@ -1,0 +1,223 @@
+[versions]
+anthropic = "0.1.0-alpha.8"
+arrow = "1.2.4"
+assertj = "3.26.3"
+awaitility = "4.2.2"
+awsKotlin = "1.6.36"
+bouncycastle = "1.78"
+commons-csv = "1.12.0"
+commons-lang3 = "3.17.0"
+commons-text = "1.12.0"
+commons-validator = "1.7"
+commons-compress = "1.20"
+commons-codec = "1.14"
+commons-io = "2.7"
+json-schema-validator = "1.5.3"
+exposed = "0.49.0"
+firebase = "9.2.0"
+graalvm-js = "23.0.1"
+hikari = "6.1.0"
+jackson = "2.18.1"
+janino = "3.1.12"
+jbcrypt = "0.4"
+jdbi = "3.47.0"
+jedis = "5.2.0"
+jts = "1.20.0"
+junit5 = "5.13.4"
+junitPlatform = "1.13.4"
+kotlin = "2.3.10"
+kotlinPoet = "1.18.1"
+kotlinx = "1.10.1"
+ksp = "2.3.4"
+ktlintPlugin = "12.1.1"
+langchain = "1.12.2"
+libPhoneNumber = "8.13.50"
+mockk = "1.13.13"
+nd4j = "1.0.0-M2.1"
+okhttp = "5.3.0"
+openapi = "5.2.0"
+openapiConfig = "1.5.3"
+opencv = "4.9.0-0"
+opentelemetry = "1.47.0"
+postgresql = "42.7.4"
+postgis = "2024.1.0"
+redisson = "4.3.0"
+retrofit = "3.0.0"
+sendGrid = "4.10.3"
+serializationJson = "1.7.3"
+shadow = "9.3.1"
+slf4j = "2.0.17"
+snakeYaml = "2.3"
+snappy = "1.1.10.7"
+spatial4j = "0.8"
+spongyCastle = "1.58.0.0"
+twilio = "10.6.4"
+neo4j-driver = "5.24.0"
+jtokkit = "1.1.0"
+minio = "8.5.17"
+pdfbox = "3.0.3"
+poi = "5.2.5"
+google-cloud-document-ai = "2.89.0"
+google-cloud-storage = "2.49.0"
+tika = "2.9.2"
+imageio = "3.10.1"
+
+[plugins]
+allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+
+[libraries]
+
+aws-ses = { module = "aws.sdk.kotlin:ses", version.ref = "awsKotlin" }
+aws-s3 = { module = "aws.sdk.kotlin:s3", version.ref = "awsKotlin" }
+aws-sqs = { module = "aws.sdk.kotlin:sqs", version.ref = "awsKotlin" }
+
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx" }
+kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx" }
+kotlinx-coroutines-reactor = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactor", version.ref = "kotlinx" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
+
+opentelemetry-bom = { group = "io.opentelemetry", name = "opentelemetry-bom", version.ref = "opentelemetry" }
+opentelemetry-api = { group = "io.opentelemetry", name = "opentelemetry-api", version.ref = "opentelemetry" }
+opentelemetry-sdk = { group = "io.opentelemetry", name = "opentelemetry-sdk", version.ref = "opentelemetry" }
+opentelemetry-exporter-otlp = { group = "io.opentelemetry", name = "opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
+opentelemetry-sdk-trace = { group = "io.opentelemetry", name = "opentelemetry-sdk-trace", version.ref = "opentelemetry" }
+
+ai-anthropic-java = { module = "com.anthropic:anthropic-java", version.ref = "anthropic" }
+
+apache-common-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+apache-common-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
+apache-common-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
+apache-common-validator = { module = "commons-validator:commons-validator", version.ref = "commons-validator" }
+apache-common-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }
+apache-common-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+apache-bcel = { module = "org.apache.bcel:bcel", version = "6.4.1" }
+
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+
+codegen-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+codegen-kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinPoet" }
+compiler-janino = { module = "org.codehaus.janino:janino", version.ref = "janino" }
+
+communication-sendgrid = { module = "com.sendgrid:sendgrid-java", version.ref = "sendGrid" }
+communication-twilio = { module = "com.twilio.sdk:twilio", version.ref = "twilio" }
+
+crypto-jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
+crypto-snappy-java = { module = "org.xerial.snappy:snappy-java", version.ref = "snappy" }
+crypto-spongycastle-core = { module = "com.madgag.spongycastle:core", version.ref = "spongyCastle" }
+
+database-hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+database-jdbi-core = { module = "org.jdbi:jdbi3-core", version.ref = "jdbi" }
+database-postgis-jdbc = { module = "net.postgis:postgis-jdbc", version.ref = "postgis" }
+database-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+exposed-java-time = { module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "exposed" }
+
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase" }
+
+geospatial-jts = { module = "org.locationtech.jts:jts-core", version.ref = "jts" }
+geospatial-spatial4j = { module = "org.locationtech.spatial4j:spatial4j", version.ref = "spatial4j" }
+
+graalvm-js = { group = "org.graalvm.js", name = "js", version.ref = "graalvm-js" }
+graalvm-js-scriptengine = { group = "org.graalvm.js", name = "js-scriptengine", version.ref = "graalvm-js" }
+
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-module-jsonschema = { module = "com.fasterxml.jackson.module:jackson-module-jsonSchema", version.ref = "jackson" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+
+json-schema-validator = { module = "com.networknt:json-schema-validator", version.ref = "json-schema-validator" }
+ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+
+langchain-anthropic = { module = "dev.langchain4j:langchain4j-anthropic", version.ref = "langchain" }
+langchain-core = { module = "dev.langchain4j:langchain4j", version.ref = "langchain" }
+langchain-gemini = { module = "dev.langchain4j:langchain4j-google-ai-gemini", version.ref = "langchain" }
+langchain-openAi = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain" }
+langchain-pgvector = { module = "dev.langchain4j:langchain4j-pgvector", version.ref = "langchain" }
+langchain-qdrant = { module = "dev.langchain4j:langchain4j-qdrant", version.ref = "langchain" }
+langchain-reactor = { module = "dev.langchain4j:langchain4j-reactor", version.ref = "langchain" }
+
+logging-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.12" }
+logging-logback-json-classic = { module = "ch.qos.logback.contrib:logback-json-classic", version = "0.1.5" }
+logging-logback-jackson = { module = "ch.qos.logback.contrib:logback-jackson", version = "0.1.5" }
+logging-logback-logstash-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version = "8.0" }
+logging-slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+
+micronaut-openapi = { module = "io.micronaut.openapi:micronaut-openapi", version.ref = "openapi" }
+micronaut-openapi-config = { module = "io.micronaut.configuration:micronaut-openapi", version.ref = "openapiConfig" }
+
+networking-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+networking-okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+networking-okhttp-mockserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+networking-okhttp-sse = { module = "com.squareup.okhttp3:okhttp-sse", version.ref = "okhttp" }
+networking-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+networking-retrofit-jackson = { module = "com.squareup.retrofit2:converter-jackson", version.ref = "retrofit" }
+networking-retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+
+redis-jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
+redis-redisson = { module = "org.redisson:redisson", version.ref = "redisson" }
+
+rabbitmq-client = { module = "com.rabbitmq:amqp-client", version = "5.20.0" }
+
+testing-assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+testing-awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
+testing-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+testing-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatform" }
+testing-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+testing-strikt = { module = "io.strikt:strikt-jvm", version = "0.34.0" }
+
+swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version = "2.2.15" }
+
+utility-libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libPhoneNumber" }
+utility-snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeYaml" }
+utility-jsoup = { module = "org.jsoup:jsoup", version = "1.22.1" }
+utility-jgrapht = { module = "org.jgrapht:jgrapht-core", version = "1.5.2" }
+utility-ant = { module = "org.apache.ant:ant", version = "1.10.1" }
+utility-chronicle-map = { module = "net.openhft:chronicle-map", version = "3.17.4" }
+utility-cron-utils = { module = "com.cronutils:cron-utils", version = "7.0.2" }
+utility-jrcs-diff = { module = "org.jvnet.hudson:org.suigeneris.jrcs.diff", version = "0.4.2" }
+utility-jrcs-rcs = { module = "org.jvnet.hudson:org.suigeneris.jrcs.rcs", version = "0.4.2" }
+utility-commonmark = { module = "org.commonmark:commonmark", version = "0.27.1" }
+
+neo4j-java-driver = { module = "org.neo4j.driver:neo4j-java-driver", version.ref = "neo4j-driver" }
+jtokkit = { module = "com.knuddels:jtokkit", version.ref = "jtokkit" }
+minio = { module = "io.minio:minio", version.ref = "minio" }
+
+apache-pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "pdfbox" }
+apache-pdfbox-tools = { module = "org.apache.pdfbox:pdfbox-tools", version.ref = "pdfbox" }
+apache-tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
+apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
+apache-poi = { module = "org.apache.poi:poi", version.ref = "poi" }
+
+# Image processing
+imageio-core = { module = "com.twelvemonkeys.imageio:imageio-core", version.ref = "imageio" }
+imageio-jpeg = { module = "com.twelvemonkeys.imageio:imageio-jpeg", version.ref = "imageio" }
+imageio-webp = { module = "com.twelvemonkeys.imageio:imageio-webp", version.ref = "imageio" }
+nd4j = { module = "org.nd4j:nd4j-native-platform", version.ref = "nd4j" }
+opencv = { module = "org.openpnp:opencv", version.ref = "opencv" }
+scrimage-core = { module = "com.sksamuel.scrimage:scrimage-core", version = "4.1.3" }
+scrimage-webp = { module = "com.sksamuel.scrimage:scrimage-webp", version = "4.1.3" }
+
+zjsonpatch = { module = "io.github.vishwakarma:zjsonpatch", version = "0.6.0" }
+stripe-java = { module = "com.stripe:stripe-java", version = "25.12.0" }
+svix = { module = "com.svix:svix", version = "1.61.3" }
+google-cloud-documentai = { module = "com.google.cloud:google-cloud-document-ai", version.ref = "google-cloud-document-ai" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version.ref = "google-cloud-storage" }
+onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version = "1.24.2" }
+playwright = { module = "com.microsoft.playwright:playwright", version = "1.58.0" }
