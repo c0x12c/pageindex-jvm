@@ -1,10 +1,11 @@
 plugins {
   kotlin("jvm") version "2.0.21"
   `maven-publish`
+  signing
 }
 
 group = "com.c0x12c"
-version = "0.1.0"
+version = System.getenv("RELEASE_VERSION") ?: "0.1.0"
 
 repositories {
   mavenCentral()
@@ -53,6 +54,56 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
+
+      pom {
+        name.set("PageIndex KT")
+        description.set("LLM-powered hierarchical document indexing and retrieval for the JVM")
+        url.set("https://github.com/c0x12c/pageindex-kt")
+
+        licenses {
+          license {
+            name.set("Apache License 2.0")
+            url.set("https://www.apache.org/licenses/LICENSE-2.0")
+          }
+        }
+
+        developers {
+          developer {
+            id.set("c0x12c")
+            name.set("c0x12c")
+            url.set("https://github.com/c0x12c")
+          }
+        }
+
+        scm {
+          url.set("https://github.com/c0x12c/pageindex-kt")
+          connection.set("scm:git:git://github.com/c0x12c/pageindex-kt.git")
+          developerConnection.set("scm:git:ssh://git@github.com/c0x12c/pageindex-kt.git")
+        }
+      }
     }
   }
+
+  repositories {
+    maven {
+      name = "OSSRH"
+      url = uri(
+        if (version.toString().endsWith("-SNAPSHOT"))
+          "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+        else
+          "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+      )
+      credentials {
+        username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
+        password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD")
+      }
+    }
+  }
+}
+
+signing {
+  val signingKey = findProperty("signingKey") as String? ?: System.getenv("SIGNING_KEY")
+  val signingPassword = findProperty("signingPassword") as String? ?: System.getenv("SIGNING_PASSWORD")
+  useInMemoryPgpKeys(signingKey, signingPassword)
+  sign(publishing.publications["maven"])
 }
