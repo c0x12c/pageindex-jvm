@@ -9,8 +9,23 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: "read"
+      id-token: "write"
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Create GitHub App Token
+        uses: actions/create-github-app-token@v2
+        id: github-app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
+          token: ${{ steps.github-app-token.outputs.token }}
 
       - name: Extract version from tag
         id: version
@@ -31,11 +46,17 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.VERSION }}
 
       - name: Publish to Maven Central
-        run: ./gradlew publishMavenPublicationToOSSRHRepository
+        run: |
+          ./gradlew publishAndReleaseToMavenCentral \
+            -Psigning.keyId=${SIGNING_KEY_ID} \
+            -Psigning.password=${SIGNING_PASSWORD} \
+            -Psigning.secretKeyRingFile=${GITHUB_WORKSPACE}/secring.gpg \
+            -PmavenCentralUsername=${MAVEN_CENTRAL_USERNAME} \
+            -PmavenCentralPassword=${MAVEN_CENTRAL_PASSWORD}
         env:
           RELEASE_VERSION: ${{ steps.version.outputs.VERSION }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
